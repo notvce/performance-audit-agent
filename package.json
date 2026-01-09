@@ -78,10 +78,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/performance-audit-agent.git"
+    "url": "https://github.com/YOUR_USERNAME/performance-audit-agent.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/performance-audit-agent/issues"
+    "url": "https://github.com/YOUR_USERNAME/performance-audit-agent/issues"
   },
-  "homepage": "https://github.com/your-org/performance-audit-agent#readme"
+  "homepage": "https://github.com/YOUR_USERNAME/performance-audit-agent#readme"
 }
