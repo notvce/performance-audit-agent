@@ -1,5 +1,5 @@
 
-// @ts-ignore
+
 import lighthouse from 'lighthouse';
 import * as chromeLauncher from 'chrome-launcher';
 
