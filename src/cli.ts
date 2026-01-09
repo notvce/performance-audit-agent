@@ -1,7 +1,6 @@
 import { detectLanguageAndFramework } from './core/detector.js';
-import { analyzeBundle } from './core/detector.js';
-import { applyCompression } from './core/detector.js';
-import { minifyAssets } from './core/detector.js';
+import { analyzeBundle } from './core/bundle-analyzer.js';
+import { applyCompression, minifyAssets } from './core/optimizer.js';
 
 const args = process.argv.slice(2);
 const command = args[0];

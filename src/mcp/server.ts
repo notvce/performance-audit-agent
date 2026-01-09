@@ -1,10 +1,14 @@
+
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
+import path from 'path';
 import { detectLanguageAndFramework } from '../core/detector.js';
-import { analyzeBundle } from '../core/detector.js';
-import { applyCompression } from '../core/detector.js';
-import { minifyAssets } from '../core/detector.js';
+import { analyzeBundle } from '../core/bundle-analyzer.js';
+import { applyCompression, minifyAssets } from '../core/optimizer.js';
+import { optimizeImages } from '../core/images.js';
+import { runLighthouseAudit } from '../core/lighthouse.js';
+import { generateReport } from '../reporting/generator.js';
 
 const server = new McpServer({
   name: 'performance-audit-agent',
@@ -21,7 +25,8 @@ server.registerTool(
   },
   async (args: { path?: string | undefined }) => {
     try {
-      const detection = await detectLanguageAndFramework(args.path ?? process.cwd());
+      const p = args.path ?? process.cwd();
+      const detection = await detectLanguageAndFramework(p);
       return {
         content: [{
           type: 'text',
@@ -47,11 +52,12 @@ server.registerTool(
   },
   async (args: { path?: string | undefined }) => {
     try {
-      const a = await analyzeBundle(args.path ?? process.cwd());
+      const p = args.path ?? process.cwd();
+      const a = await analyzeBundle(p);
       return {
         content: [{
           type: 'text',
-          text: JSON.stringify({ success: true, reduction: String(a.totalAssets.reductionPercentage) + '%' })
+          text: JSON.stringify({ success: true, data: a })
         }]
       };
     } catch (error) {
@@ -74,11 +80,12 @@ server.registerTool(
   },
   async (args: { path?: string | undefined; apply?: boolean | undefined }) => {
     try {
-      const c = await applyCompression(args.path ?? './dist', args.apply ?? false);
+      const p = args.path ?? path.join(process.cwd(), 'dist');
+      const c = await applyCompression(p, args.apply ?? false);
       return {
         content: [{
           type: 'text',
-          text: JSON.stringify({ success: true, format: c.recommendedFormat })
+          text: JSON.stringify({ success: true, data: c })
         }]
       };
     } catch (error) {
@@ -101,11 +108,12 @@ server.registerTool(
   },
   async (args: { path?: string | undefined; apply?: boolean | undefined }) => {
     try {
-      const m = await minifyAssets(args.path ?? './dist', args.apply ?? false);
+      const p = args.path ?? path.join(process.cwd(), 'dist');
+      const m = await minifyAssets(p, args.apply ?? false);
       return {
         content: [{
           type: 'text',
-          text: JSON.stringify({ success: true, reduction: String(m.totalReduction) + '%' })
+          text: JSON.stringify({ success: true, data: m })
         }]
       };
     } catch (error) {
@@ -126,12 +134,14 @@ server.registerTool(
       apply: z.boolean().optional()
     })
   },
-  async (_args: { path?: string | undefined; apply?: boolean | undefined }) => {
+  async (args: { path?: string | undefined; apply?: boolean | undefined }) => {
     try {
+      const p = args.path ?? path.join(process.cwd(), 'public'); // Usually where images are
+      const i = await optimizeImages(p, args.apply ?? false);
       return {
         content: [{
           type: 'text',
-          text: JSON.stringify({ success: true, images: 10, reduction: '20%' })
+          text: JSON.stringify(i)
         }]
       };
     } catch (error) {
@@ -142,6 +152,75 @@ server.registerTool(
     }
   }
 );
+
+server.registerTool(
+    'audit_repository',
+    {
+        description: 'Run complete performance audit',
+        inputSchema: z.object({
+            path: z.string().optional(),
+            url: z.string().optional(),
+            outputPath: z.string().optional()
+        })
+    },
+    async (args: { path?: string | undefined; url?: string | undefined; outputPath?: string | undefined }) => {
+        try {
+           const p = args.path ?? process.cwd();
+           const project = await detectLanguageAndFramework(p);
+           const bundle = await analyzeBundle(p);
+           
+           let lighthouseResult = null;
+           if (args.url) {
+               lighthouseResult = await runLighthouseAudit(args.url);
+           }
+
+           const result = {
+               project,
+               bundle,
+               lighthouse: lighthouseResult ? { score: lighthouseResult.categories.performance.score } : 'Skipped'
+           };
+           
+           if (args.outputPath) {
+               await generateReport(result, args.outputPath);
+           }
+           
+           return {
+               content: [{ type: 'text', text: JSON.stringify(result) }]
+           };
+        } catch (error) {
+             return {
+                content: [{ type: 'text', text: 'Error: ' + String(error) }],
+                isError: true
+            };
+        }
+    }
+);
+
+server.registerTool(
+    'generate_report',
+    {
+        description: 'Generate a report from JSON data',
+        inputSchema: z.object({
+            data: z.string(),
+            outputPath: z.string()
+        })
+    },
+    async (args: { data: string; outputPath: string }) => {
+        try {
+            const parsedData = JSON.parse(args.data);
+            const reportPath = await generateReport(parsedData, args.outputPath);
+             return {
+                content: [{ type: 'text', text: `Report generated at ${reportPath}` }]
+            };
+        } catch (error) {
+             return {
+                content: [{ type: 'text', text: 'Error: ' + String(error) }],
+                isError: true
+            };
+        }
+    }
+);
+
 
 const transport = new StdioServerTransport();
 server.connect(transport).then(() => console.error('Performance Audit MCP Server started'));
