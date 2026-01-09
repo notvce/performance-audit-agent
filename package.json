@@ -1,0 +1,87 @@
+{
+  "name": "@universal/performance-audit-agent",
+  "version": "1.0.0",
+  "description": "Universal performance audit agent with enterprise-grade analysis, compatible with MCP for Claude, OpenCode, Gemini, and other AI platforms",
+  "main": "dist/mcp/server.js",
+  "type": "module",
+  "bin": {
+    "performance-audit": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/mcp/server.js",
+    "cli": "node dist/cli.js",
+    "lint": "eslint src --ext .ts",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "performance",
+    "audit",
+    "mcp",
+    "lighthouse",
+    "optimization",
+    "bundle-analysis",
+    "minification",
+    "compression",
+    "brotli",
+    "gzip",
+    "web-performance",
+    "code-optimization",
+    "ai-agent",
+    "universal"
+  ],
+  "author": "Performance Audit Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "lighthouse": "^12.0.0",
+    "chrome-launcher": "^1.1.2",
+    "puppeteer": "^22.0.0",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "@next/bundle-analyzer": "^15.0.0",
+    "terser": "^5.34.1",
+    "cssnano": "^7.0.4",
+    "html-minifier-terser": "^7.2.0",
+    "compression-webpack-plugin": "^11.1.0",
+    "sharp": "^0.33.4",
+    "chalk": "^5.3.0",
+    "ora": "^8.1.0",
+    "commander": "^12.1.0",
+    "glob": "^11.0.0",
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.2.0",
+    "@babel/parser": "^7.24.7",
+    "@babel/types": "^7.24.7",
+    "typescript": "^5.5.3",
+    "acorn": "^8.12.1",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "@types/fs-extra": "^11.0.4",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "ts-jest": "^29.2.2",
+    "nodemon": "^3.1.4",
+    "cross-env": "^7.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/performance-audit-agent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/performance-audit-agent/issues"
+  },
+  "homepage": "https://github.com/your-org/performance-audit-agent#readme"
+}

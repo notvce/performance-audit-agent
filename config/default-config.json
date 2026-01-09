@@ -1,0 +1,68 @@
+{
+  "lighthouse": {
+    "thresholds": {
+      "performance": 90,
+      "accessibility": 90,
+      "best-practices": 90,
+      "seo": 90
+    },
+    "formFactor": "desktop",
+    "screenEmulation": {
+      "mobile": false,
+      "width": 1920,
+      "height": 1080,
+      "deviceScaleFactor": 1
+    }
+  },
+  "bundle": {
+    "maxSize": 500000,
+    "maxInitialChunks": 3,
+    "minify": true,
+    "treeShake": true
+  },
+  "compression": {
+    "preferBrotli": true,
+    "gzipLevel": 9,
+    "brotliQuality": 11,
+    "minFileSize": 1024,
+    "minRatio": 0.8
+  },
+  "minification": {
+    "javascript": {
+      "compress": true,
+      "mangle": true,
+      "dropConsole": true,
+      "dropDebugger": true,
+      "ecma": 2020
+    },
+    "css": {
+      "preset": "default",
+      "discardComments": true
+    },
+    "html": {
+      "collapseWhitespace": true,
+      "removeComments": true,
+      "removeRedundantAttributes": true,
+      "useShortDoctype": true,
+      "minifyCSS": true,
+      "minifyJS": true
+    }
+  },
+  "images": {
+    "formats": ["webp", "avif"],
+    "quality": 85,
+    "lazyLoading": true,
+    "responsive": true,
+    "placeholder": true
+  },
+  "output": {
+    "path": "./audit-reports",
+    "format": "html",
+    "includeVisualizations": true
+  },
+  "recommendations": {
+    "maxRecommendations": 20,
+    "includeCodeExamples": true,
+    "groupByPriority": true
+  }
+}
